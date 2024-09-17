@@ -36,10 +36,13 @@ LitGuide-AI is a research tool designed to assist students in STEM and other res
 2. You must have Python3 or any later versions available.
 3. You must have installed Convex using npm onto your local machine. [Click here to learn how.](https://docs.convex.dev/quickstart/python)
 4. You can optionally create a virtual environment for this project (recommended).
+5. You have to fetch 3 API Keys: [Gemini API KEY](https://www.youtube.com/watch?v=OVnnVnLZPEo&pp=ygUSZ2V0IGdlbWluaSBhcGkga2V5), GitHub API Key (navigate to Settings -> Personal Access Tokens -> Tokens (Classics) -> Generate New Token -> Check relevant scopes -> Generate) & a [Convex URL Key: generated using command](https://docs.convex.dev/get-started)
 
-  
+### Steps
 1. Copy the repository link.
 2. Clone the project onto your local machine using the 'git clone' command.
 3. Once the repository has successfully been cloned onto your machine, open the main repo directory using your preferred IDE, and type 'npx convex dev' . [Click here to see more on this.](https://docs.convex.dev/get-started)
 4. Once the command runs in the background, open another terminal, and activate your virtual environment (if you have created one).
-5. Run the project using 'streamlit run app.py'.
+5. Make sure to move keywords.ts, messages.ts and schema.ts into the folder created by generating 'convex url key'.
+6. Update paths to .env and .env.local correctly.
+7. Run the project using 'streamlit run app.py'.
