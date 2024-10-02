@@ -1,0 +1,15 @@
+langchain
+tiktoken
+unstructured
+pdf2image
+pdfminer
+PyPDF2
+streamlit
+google-generativeai
+python-dotenv
+langchain
+chromadb
+faiss-cpu
+langchain_google_genai
+requests
+time
