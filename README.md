@@ -32,15 +32,15 @@ LitGuide-AI is a research tool designed to assist students in STEM and other res
 
 ## Images
 
-![alt-text]('my-app\Images\Screenshot 2024-10-01 153602.png')
+![alt text]('my-app\Images\Screenshot 2024-10-01 153602.png')
 Chat Interface
-![alt-text]('my-app\Images\Screenshot 2024-10-01 153850.png')
+![alt text]('my-app\Images\Screenshot 2024-10-01 153850.png')
 Chat with PDF Option
-![alt-text]('my-app\Images\Screenshot 2024-10-01 154342.png')
+![alt text]('my-app\Images\Screenshot 2024-10-01 154342.png')
 Fetch Papers Option
-![alt-text]('my-app\Images\Screenshot 2024-10-01 154451.png')
+![alt text]('my-app\Images\Screenshot 2024-10-01 154451.png')
 Recommend Tech Stack Option
-![alt-text]('my-app\Images\Screenshot 2024-10-01 154540.png')
+![alt text]('my-app\Images\Screenshot 2024-10-01 154540.png')
 Summarize PDF Option
 
 ## Features
