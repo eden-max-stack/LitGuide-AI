@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-def getScholarData(keywords):
+def get_scholar_data(keywords):
     try:
 
         # Join keywords with "+" for Google Scholar search syntax
@@ -52,7 +52,7 @@ def getScholarData(keywords):
         print("Error: " + str(err))
 
 
-def getAuthorProfileData():
+def get_author_profile_data():
     try:
         url = "https://scholar.google.com/citations?hl=en&user=cOsxSDEAAAAJ"
         headers = {

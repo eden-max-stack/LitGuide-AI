@@ -3,11 +3,11 @@ import re
 import os
 from dotenv import load_dotenv
 
-load_dotenv("C:\\Users\\maxim\\hackathon\\my-app\\.env")
+load_dotenv("C:\\Users\\maxim\\LitGuide-AI\\my-app\\.env")
 GITHUB_API_KEY = os.getenv("GITHUB_API_KEY")
-my_git = Github(GITHUB_API_KEY)
+github_client = Github(GITHUB_API_KEY)
 
-def getTopics(keywords):
+def get_topics(keywords):
     #print(keywords)
     topics = set()
     for el in keywords:
@@ -15,18 +15,18 @@ def getTopics(keywords):
         
     return topics
 
-def searchRepos(keywords):
-    print("Keywords to be searched are: " + keywords)
+def search_repos(keywords):
+    print(f"Keywords to be searched are: {keywords}")
     print(type(keywords))
-    print(my_git.get_rate_limit())
+    print(github_client.get_rate_limit())
 
     keyword_list = [kw.strip() for kw in keywords.split(',')]
 
     query = ", ".join(keyword_list) + " in:description,readme,name"
-    print("Constructed query: ", query)
+    print(f"Constructed query: {query}")
 
 
-    repos = my_git.search_repositories(query=query)
+    repos = github_client.search_repositories(query=query)
     if repos == None:
         print("search results are None.")
 

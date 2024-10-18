@@ -30,19 +30,6 @@ LitGuide-AI is a research tool designed to assist students in STEM and other res
 6. Web Scraping: BeautifulSoup
 7. GitHub API: Recommending Tech Stack for similar projects.
 
-## Images
-
-![Alt text]('my-app\Images\Screenshot 2024-10-01 153602.png')
-Chat Interface
-![Alt text]('my-app\Images\Screenshot 2024-10-01 153850.png')
-Chat with PDF Option
-![Alt text]('my-app\Images\Screenshot 2024-10-01 154342.png')
-Fetch Papers Option
-![Alt text]('my-app\Images\Screenshot 2024-10-01 154451.png')
-Recommend Tech Stack Option
-![Alt text]('my-app\Images\Screenshot 2024-10-01 154540.png')
-Summarize PDF Option
-
 ## Features
 
 ### Existing Features

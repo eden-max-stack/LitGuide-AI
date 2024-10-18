@@ -1,8 +1,9 @@
 from flask import Flask, request, jsonify
+import logging
 from flask_cors import CORS
 from main import fetch_papers, chat_with_pdfs, summarize_file, fetch_relevant_keywords, extract_keywords  # Ensure these functions return valid responses
 from analyze_ts import extract_popular_keywords
-from pygithub import getTopics, searchRepos
+from pygithub import get_topics, search_repos
 from PyPDF2 import PdfReader
 from werkzeug.utils import secure_filename
 import os
@@ -16,18 +17,23 @@ if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+logging.basicConfig(level=logging.INFO)
 
 
 @app.route('/api/chat-with-pdf', methods=['POST', 'GET'])
 def chat_with_pdf():
     try:
+
+        app.logger.info("Received a request to /api/chat-with-pdf")
         # Check if the request contains a file
         if 'file' not in request.files:
+            app.logger.error("No file part")
             return jsonify({"error": "No file part"}), 400
 
         pdf_file = request.files['file']  # Fetch the file
 
         if pdf_file.filename == '':
+            app.logger.error("No selected file")
             return jsonify({"error": "No selected file"}), 400    
 
         # Parse additional data like the user's question
@@ -35,15 +41,19 @@ def chat_with_pdf():
 
         # Check if the query is provided
         if not user_query:
+            app.logger.error("No user query")
             return jsonify({"error": "No question provided"}), 400
 
         # Process the file and query (You can add your logic here)
         response_message = chat_with_pdfs(user_query)  # Add file processing if needed
         print(response_message)
 
+        app.logger.info("Response message generated")
+
         return jsonify({"response": response_message}), 200
 
     except Exception as e:
+        app.logger.error(f"Error occurred: {e}")
         return jsonify({"error": str(e)}), 500
 
 
@@ -122,7 +132,7 @@ def recommend_ts():
         keywords = extract_keywords(user_prompt)
         response = fetch_relevant_keywords(keywords)
 
-        response = searchRepos(response) #repo-data
+        response = search_repos(response) #repo-data
         keyword_popularity = extract_popular_keywords(response)
 
         popular_keywords = keyword_popularity.most_common(10)
