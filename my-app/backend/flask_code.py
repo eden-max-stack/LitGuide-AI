@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 import logging
 from flask_cors import CORS
-from main import fetch_papers, chat_with_pdfs, summarize_file, fetch_relevant_keywords, extract_keywords  # Ensure these functions return valid responses
+from main import fetch_papers, chat_with_pdfs, summarize_file, fetch_relevant_keywords  # Ensure these functions return valid responses
 from analyze_ts import extract_popular_keywords
 from pygithub import get_topics, search_repos
 from PyPDF2 import PdfReader

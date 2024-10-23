@@ -16,7 +16,6 @@ import numpy as np
 import convex
 import torch
 from webscraping import get_scholar_data
-from keyword_extraction import get_bert_embeddings
 
 # Load environment variables
 load_dotenv("C:\\Users\\maxim\\LitGuide-AI\\my-app\\.env.local")
@@ -29,7 +28,6 @@ google_api_key = os.getenv("GOOGLE_API_KEY")
 genai.configure(api_key=google_api_key)
 
 def fetch_papers(query):
-    #keywords = extract_keywords(query)
     response = fetch_relevant_keywords(query)
 
     # Send keywords to webscraping for fetching papers
@@ -38,13 +36,6 @@ def fetch_papers(query):
 
     # Return the response with papers and links
     return response, papers, links
-
-def extract_keywords(query, num_keywords=5):
-    r = Rake()
-    r.extract_keywords_from_text(query)
-    keywords_extracted = r.get_ranked_phrases()
-    print(f"Extracted Keywords: {keywords_extracted}")
-    return keywords_extracted[:num_keywords]  # Return only the top 'num_keywords'
 
 def fetch_relevant_keywords(keywords):
     try:

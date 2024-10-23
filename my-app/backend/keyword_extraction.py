@@ -28,7 +28,7 @@ adjective_tags = ['JJ','JJR','JJS']
 
 lemmatized_text = []
 
-def POS_tagging(POS_tag):
+def POS_tagging_lemmatization(POS_tag):
   for word in POS_tag:
       if word[1] in adjective_tags:
           lemmatized_text.append(str(wordnet_lemmatizer.lemmatize(word[0],pos="a")))
@@ -54,7 +54,7 @@ def POS_filtering(POS_tag):
 
 # complete stopword generation
 
-stopword_file = open("/content/drive/MyDrive/Colab Notebooks/long_stopwords.txt", "r")
+stopword_file = open("C:\\Users\\maxim\\LitGuide-AI\\my-app\\random_files\\long_stopwords.txt", "r")
 
 lots_of_stopwords = []
 for line in stopword_file.readlines():
@@ -76,8 +76,6 @@ processed_text = set(processed_text)
 print(processed_text)
 
 # building graph
-
-import math
 
 def build_graph(vocab):
 
@@ -147,3 +145,52 @@ def build_graph(vocab):
 
   for i in range(0,vocab_len):
     print(f"Score of {vocab[i]} : {score[i]}")
+
+
+def main():
+  text = """
+          Crops and other plants are often under attack from bacteria, viruses, and other pathogens. When a plant
+        senses a microbial invasion, it makes radical changes in the chemical soup of proteins -- the workhorse
+        molecules of life -- inside its cells.
+        In recent years, Dong and her team have been piecing together just how they do it. In a new
+        study published in the journal Cell, Dong and first author Jinlong Wang reveal the key components in plant
+        cells that reprogram their protein-making machinery to fight disease.
+        Each year, around 15% of crop yield is lost to bacterial and fungal diseases, costing the global economy
+        some $220 billion. Plants rely on their immune system to help them fight back, Dong said.
+        Unlike animals, plants don’t have specialized immune cells that can travel through the bloodstream to the
+        site of infection; every cell in the plant has to be able to stand and fight to defend itself, quickly shifting into
+        battle mode.
+        When plants come under attack, they shift their priorities from growth to defense, so cells start synthesizing
+        new proteins and suppress production of others. Then “within two to three hours things return to normal,”
+        Dong said.
+        The tens of thousands of proteins made in cells do many jobs: catalyzing reactions, serving as chemical
+        messengers, recognizing foreign substances, moving materials in and out. To build a specific protein,
+        genetic instructions in the DNA packed inside the cell’s nucleus are transcribed into a messenger molecule
+        called mRNA. This strand of mRNA then heads out into the cytoplasm, where a structure called a ribosome
+        “reads” the message and translates it into a protein.
+        In a 2017 study, Dong and her team found that when a plant is infected, certain mRNA molecules are
+        translated into proteins faster than others. What these mRNA molecules have in common, the researchers
+        discovered, is a region at the front end of the RNA strand with recurring letters in its genetic code, where
+        the nucleotide bases adenine and guanine repeat themselves over and over again."""
+
+  text = clean(text)
+  print(f"cleaned_text: {text}")
+  
+  # pos tagging
+  text = pos_tagging(text)
+
+  # lemmatization
+  text = POS_tagging_lemmatization(text)
+
+  # POS filtering
+  text = POS_filtering(text)
+
+  # removing stopwords
+  text = remove_stopwords(text)
+
+  #building graph
+  text = build_graph(text)
+
+
+if __name__ == "__main__":
+   main()
