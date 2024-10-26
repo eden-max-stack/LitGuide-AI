@@ -24,11 +24,6 @@ const App: React.FC = () => {
   // Reference to chat box for scrolling
   const chatBoxRef = useRef<HTMLDivElement>(null);
 
-  // Flags for each option
-  const [isChatWithPdf, setIsChatWithPdf] = useState<boolean>(false);
-  const [isSummarizePdf, setIsSummarizePdf] = useState<boolean>(false);
-  const [isFetchPapers, setIsFetchPapers] = useState<boolean>(false);
-  const [isTechStackRec, setIsTechStackRec] = useState<boolean>(false);
 
   // Hook to fetch messages from Convex (if needed)
   //const fetchedMessages = useQuery(api.messages.listMessages); // Uncomment if you want to fetch messages on load
@@ -102,10 +97,6 @@ const App: React.FC = () => {
   // Handle Fetch Papers
   const handleFetchPapers = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsFetchPapers(true); // Set the flag for fetch papers
-    setIsChatWithPdf(false);  // Reset other flags
-    setIsSummarizePdf(false);
-    setIsTechStackRec(false);
 
     handleSendMessage(e); // Send the message for fetching papers
   };
@@ -121,11 +112,6 @@ const App: React.FC = () => {
 
   // Handle Summarize PDF
   const handleSummarizePDF = async () => {
-    setIsSummarizePdf(true); // Set the flag for summarize PDF
-    setIsChatWithPdf(false);  // Reset other flags
-    setIsFetchPapers(false);
-    setIsTechStackRec(false);
-
 
   // Prepare the FormData for the PDF files
   const formData = new FormData();
@@ -194,10 +180,6 @@ const App: React.FC = () => {
   };
 
   const handleChatWithPDF = async () => {
-    setIsChatWithPdf(true); // Set the flag for chat with PDF
-    setIsSummarizePdf(false); // Reset other flags
-    setIsFetchPapers(false);
-    setIsTechStackRec(false);
 
     if (!pdfFiles || pdfFiles.length === 0) {
       alert("Please upload at least one PDF file.");
@@ -345,10 +327,6 @@ const handleSendMessage = async (e: React.FormEvent) => {
 };
 
 const handleTechStackRec = async () => {
-  setIsChatWithPdf(false); // Set the flag for chat with PDF
-  setIsSummarizePdf(false); // Reset other flags
-  setIsFetchPapers(false);
-  setIsTechStackRec(true);
 
   if (!newMessageText.trim()) {
     alert("Message cannot be empty.");
