@@ -14,10 +14,10 @@ export const listMessages = query({
 });
 
 export const send = mutation({
-  args: { author: v.string(), message: v.any() },
-  handler: async (ctx, { author, message }) => {
+  args: { author: v.string(), message: v.any(), type: v.string() },
+  handler: async (ctx, { author, message, type }) => {
     // Send a new message.
-    await ctx.db.insert("messages", { author, message });
+    await ctx.db.insert("messages", { author, message, type });
   },
 });
 

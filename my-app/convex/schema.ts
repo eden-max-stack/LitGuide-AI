@@ -6,6 +6,7 @@ export default defineSchema({
   messages: defineTable({
     author: v.string(),
     message: v.any(),
+    type: v.string(),
   }),
 
   keywords: defineTable({

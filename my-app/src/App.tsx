@@ -8,6 +8,7 @@ interface Message {
   _id: string;
   body: string;
   author: string;
+  type: string;
 }
 
 const App: React.FC = () => {
@@ -23,7 +24,7 @@ const App: React.FC = () => {
   // Reference to chat box for scrolling
   const chatBoxRef = useRef<HTMLDivElement>(null);
 
-  // Flags for each PDF option
+  // Flags for each option
   const [isChatWithPdf, setIsChatWithPdf] = useState<boolean>(false);
   const [isSummarizePdf, setIsSummarizePdf] = useState<boolean>(false);
   const [isFetchPapers, setIsFetchPapers] = useState<boolean>(false);
@@ -35,93 +36,68 @@ const App: React.FC = () => {
 
   const renderMessageContent = (message: Message): JSX.Element => {
     try {
-      if (message.author === 'Gemini' && isFetchPapers) {
-        // Parse the AI's response
+      if (message.author === 'Gemini' && message.type === "fetch") {
+        // Parse the AI's response for fetching papers
         const data = message.body;
         console.log(data);
   
         if (
           Array.isArray(data) &&
           typeof data[0] === 'string' && // Check that the first element is a string (the topic)
-          Array.isArray(data[1]) && data[1].every((item) => typeof item === 'string') && // Check that the second element is an array of strings (titles)
-          Array.isArray(data[2]) && data[2].every((item) => typeof item === 'string') // Check that the third element is an array of strings (URLs)
+          Array.isArray(data[1]) && data[1].every((item) => typeof item === 'string') && // Check titles
+          Array.isArray(data[2]) && data[2].every((item) => typeof item === 'string') // Check URLs
         ) {
-        const topic = data[0]; // First element is the topic
-        const titles: string[] = data[1]; // Second element is the list of titles
-        const links: string[] = data[2]; // Third element is the list of URLs
+          const [topic, titles, links] = data; // Destructure topic, titles, and links
   
-        return (
-          <>
-            <h3>{topic}</h3> {/* Render the topic */}
-            <ol>
-              {titles.map((title, index) => (
-                <li key={index}>
-                  <a href={links[index]} target="_blank" rel="noopener noreferrer">
-                    {title}
-                  </a>
-                </li>
-              ))}
-            </ol>
-          </>
-        );
-      } else {
-        // If data structure isn't as expected, render a fallback message
-        return <p>Unexpected AI response format.</p>;
-      } }
-      else if (message.author === 'Gemini' && isTechStackRec) {
+          return (
+            <>
+              <h3>{topic}</h3> {/* Render the topic */}
+              <ol>
+                {titles.map((title, index) => (
+                  <li key={index}>
+                    <a href={links[index]} target="_blank" rel="noopener noreferrer">
+                      {title}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </>
+          );
+        } else {
+          return <p>Unexpected AI response format.</p>;
+        }
+      } else if (message.author === 'Gemini' && message.type === "techStack") {
         const data = message.body;
         console.log(data);
-    
-        // Check that data is an array and contains the correct structure
+  
+        // Check that data is an array with correct structure
         if (
-            Array.isArray(data) &&
-            data.every((item) => Array.isArray(item) && item.length === 2) // Each item should be an array with 2 elements
+          Array.isArray(data) &&
+          data.every((item) => Array.isArray(item) && item.length === 2)
         ) {
-            // Create an array of React elements
-            const output = data.map(([techStack, popularity]) => {
-                return (
-                    <div key={techStack}> {/* Ensure a unique key for each item */}
-                        {techStack} : {popularity}
-                    </div>
-                );
-            });
-    
-            return <>{output}</>; // Wrap in a fragment and return
+          // Create React elements for the tech stack
+          const output = data.map(([techStack, popularity]) => (
+            <div key={techStack}>
+              {techStack} : {popularity}
+            </div>
+          ));
+  
+          return <>{output}</>;
         }
-    }
-    
-      else {
-        // For user messages, just render the text
+      } else if (message.author === 'Gemini') {
+        // Catch-all for other Gemini messages
+        return <p>{message.body}</p>;
+      } else {
+        // Render User messages or anything else directly
         return <p>{message.body}</p>;
       }
     } catch (error) {
       console.error("Error parsing AI response:", error);
       return <p>{message.body}</p>; // Fallback in case of a parsing error
     }
-  };  
+  };
   
-  /*const downloadPDF = async(e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Send the message to the Python backend
-    try {
-      const response = await fetch('', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ prompt: newMessageText }),
-      });
-
-      const data = await response.json();
-      console.log('Response from Python:', data.response);
-    } catch (error) {
-      console.error('Error sending prompt to Python:', error);
-    }
-
-    // Clear input field
-    setNewMessageText('');
-  }; */
+  
 
   // Handle Fetch Papers
   const handleFetchPapers = (e: React.FormEvent) => {
@@ -163,9 +139,17 @@ const App: React.FC = () => {
     _id: userMessageId,
     body: 'Provide a summary on the uploaded file, please!',
     author: 'User',
+    type: "summarize",
   };
 
   setMessages((prevMessages) => [...prevMessages, userMessage]);  
+
+  // Send the message to Convex
+  try {
+    await sendMessage({ message: newMessageText, author: 'User', type: "summarize" });
+  } catch (error) {
+    console.error('Error sending user message to Convex:', error);
+  }
 
   try {
     const response = await fetch("http://localhost:8080/api/summarize-pdf", {
@@ -184,14 +168,16 @@ const App: React.FC = () => {
           _id: aiResponseId.toString(),
           body: data.response,
           author: 'Gemini',
+          type: "summarize"
         };
 
         // Add the AI's summary to the messages
         setMessages((prevMessages) => [...prevMessages, aiResponse]);
+        //setNewMessageText(data.response);
 
         // Send the message to Convex (if needed)
         try {
-          await sendMessage({ author: 'Gemini', message: data.response });
+          await sendMessage({ author: 'Gemini', message: data.response, type: "summarize" });
         } catch (error) {
           console.error('Error saving summary to Convex:', error);
         }
@@ -224,6 +210,7 @@ const App: React.FC = () => {
       _id: userMessageId,
       body: newMessageText,
       author: 'User',
+      type: "chat",
     };
 
     setMessages((prevMessages) => [...prevMessages, userMessage]);
@@ -235,6 +222,13 @@ const App: React.FC = () => {
     
     // If there's a prompt, append it to the FormData
     formData.append("question", newMessageText); 
+
+    // Send the message to Convex
+    try {
+      await sendMessage({ message: newMessageText, author: 'User', type: "chat" });
+    } catch (error) {
+      console.error('Error sending user message to Convex:', error);
+    }
   
     try {
       const response = await fetch("http://localhost:8080/api/chat-with-pdf", {
@@ -253,14 +247,16 @@ const App: React.FC = () => {
           const aiResponse: Message = {
             _id: aiResponseId.toString(),
             body: data.response,
-            author: 'Gemini', // AI's author
+            author: 'Gemini', 
+            type: "chat",
           };
 
           // Add AI's response to the message list
           setMessages((prevMessages) => [...prevMessages, aiResponse]);
+          //setNewMessageText(data.response);
 
           try {
-            await sendMessage({ author : 'Gemini', message : data.response});
+            await sendMessage({ author : 'Gemini', message : data.response, type: "chat" });
           } catch (error) {
             console.error(error);
           }
@@ -291,6 +287,7 @@ const handleSendMessage = async (e: React.FormEvent) => {
     _id: userMessageId,
     body: newMessageText,
     author: 'User',
+    type: "fetch",
   };
 
   // Add user's message to the message list
@@ -298,7 +295,7 @@ const handleSendMessage = async (e: React.FormEvent) => {
 
   // Send the message to Convex
   try {
-    await sendMessage({ message: newMessageText, author: 'User' });
+    await sendMessage({ message: newMessageText, author: 'User', type: "fetch" });
   } catch (error) {
     console.error('Error sending user message to Convex:', error);
   }
@@ -324,6 +321,7 @@ const handleSendMessage = async (e: React.FormEvent) => {
         _id: aiResponseId.toString(),
         body: data.response,
         author: 'Gemini',
+        type: "fetch",
       };
 
       // Add AI's response to the message list
@@ -331,7 +329,7 @@ const handleSendMessage = async (e: React.FormEvent) => {
 
       // Save AI response to the database
       try {
-        await sendMessage({ author: 'ai', message: aiResponse.body }); // Ensure `data.response` is defined
+        await sendMessage({ author: 'ai', message: aiResponse.body, type: "fetch" }); // Ensure `data.response` is defined
       } catch (error) {
         console.error('Error sending AI message to Convex:', error);
       }
@@ -365,6 +363,7 @@ const handleTechStackRec = async () => {
     _id: userMessageId,
     body: newMessageText,
     author: 'User',
+    type: "techStack",
   };
 
   // Add user's message to the message list
@@ -372,7 +371,7 @@ const handleTechStackRec = async () => {
 
   // Send the message to Convex
   try {
-    await sendMessage({ message: newMessageText, author: 'User' });
+    await sendMessage({ message: newMessageText, author: 'User', type: "techStack" });
   } catch (error) {
     console.error('Error sending user message to Convex:', error);
   }
@@ -395,12 +394,15 @@ const handleTechStackRec = async () => {
         _id: aiResponseId.toString(),
         body: data.response,
         author: 'Gemini',
+        type: "techStack",
       };
 
       setMessages((prevMessages) => [...prevMessages, aiResponse]);
+      // Set the AI response as the new message text
+      //setNewMessageText(data.response);
 
       try {
-        await sendMessage({ author: 'ai', message: aiResponse.body }); // Ensure `data.response` is defined
+        await sendMessage({ author: 'ai', message: aiResponse.body, type: "techStack" }); // Ensure `data.response` is defined
       } catch (error) {
         console.error('Error sending AI message to Convex:', error);
       }
@@ -447,7 +449,8 @@ const handleTechStackRec = async () => {
             <div>{message.author}</div>
             {renderMessageContent(message)}
           </article>
-  ))}
+        ))}
+
 </div>
 
         {/* Centered Buttons */}
