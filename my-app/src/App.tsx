@@ -24,6 +24,9 @@ const App: React.FC = () => {
   // Reference to chat box for scrolling
   const chatBoxRef = useRef<HTMLDivElement>(null);
 
+  // Set limit for number of files uploaded
+  const [fileLimit, setFileLimit] = useState(false);
+
 
   // Hook to fetch messages from Convex (if needed)
   //const fetchedMessages = useQuery(api.messages.listMessages); // Uncomment if you want to fetch messages on load
@@ -106,10 +109,37 @@ const App: React.FC = () => {
     if (e.target.files && e.target.files.length > 0) {
       // Convert the FileList to an array and set it to state
       const selectedFiles = Array.from(e.target.files);
-      setPdfFiles(selectedFiles);
+      handleUploadFiles(selectedFiles);
     }
   };
 
+  // Handle Multiple Uploads
+  const handleUploadFiles = (files: File[]) => {
+    const uploaded = [...pdfFiles];
+    let limitExceeded = false;
+  
+    files.some((file) => {
+      if (uploaded.findIndex((f) => f.name === file.name) === -1) {
+        uploaded.push(file);
+  
+        if (uploaded.length === 5) {
+          setFileLimit(true);
+        }
+  
+        if (uploaded.length > 5) {
+          alert('You can only upload a maximum of 5 files!');
+          setFileLimit(false);
+          limitExceeded = true;
+          return true; // Exit the loop
+        }
+      }
+      return false;
+    });
+  
+    if (!limitExceeded) setPdfFiles(uploaded);
+  };
+  
+  
   // Handle Summarize PDF
   const handleSummarizePDF = async () => {
 
@@ -412,7 +442,20 @@ const handleTechStackRec = async () => {
       {/* Left Panel */}
       <div className="left-panel">
         <h3>Upload PDF</h3>
-        <input type="file" accept="application/pdf" onChange={handleFileChange} />
+        <input type="file" accept="application/pdf" onChange={handleFileChange} multiple />
+        {/* PDF File Names */}
+        <div className="pdf-file-names">
+          <h4>Uploaded PDF Files:</h4>
+          {pdfFiles.length > 0 ? (
+            <ul>
+              {pdfFiles.map((file, index) => (
+                <li key={index}>{file.name}</li>
+              ))}
+            </ul>
+          ) : (
+            <p>No PDF files uploaded yet.</p>
+          )}
+        </div>
       </div>
       
       {/* Right Panel */}
