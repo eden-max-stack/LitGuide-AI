@@ -41,8 +41,8 @@ def fetch_relevant_keywords(keywords):
     try:
         prompt_template = """
         You are keyword extractor. You will be provided with text and output at most 
-        10 keywords from that text ranked by quality and separated by comma, 
-        nothing else.
+        10, minimum 3 keywords from that text ranked by quality and separated by comma, 
+        nothing else. Keep keywords relevant to user prompt only. 
         """
 
         model = genai.GenerativeModel(model_name="gemini-1.0-pro")

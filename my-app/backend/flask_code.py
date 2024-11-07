@@ -129,8 +129,10 @@ def recommend_ts():
 
     try:
         # Process the prompt as needed
-        keywords = extract_keywords(user_prompt)
-        response = fetch_relevant_keywords(keywords)
+        
+        response = fetch_relevant_keywords(user_prompt)
+        print(user_prompt)
+        print(response)
 
         response = search_repos(response) #repo-data
         keyword_popularity = extract_popular_keywords(response)
